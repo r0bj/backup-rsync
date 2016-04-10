@@ -124,14 +124,15 @@ func getPaths(config Config) []Path {
 	return paths	
 }
 
-// change paths order to avoid as much as possible multiple rsync to same host 
+// change paths order to avoid as much as possible multiple rsync to same host
+// separate group of paths to the same host
 func preparePathsOrder(paths []Path) []Path {
 	m := make(map[string][]Path)
 	for _, p := range paths {
 		m[p.host] = append(m[p.host], p)
 	}
 
-	// prepare sorted map by keys
+	// prepare sorted keys to iterate by sorted map m
     var keys []string
     for k := range m {
         keys = append(keys, k)
