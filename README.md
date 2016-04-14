@@ -23,6 +23,7 @@ hosts:
   
 - name: host3
   login_user: user3
+  login_port: 2222
   dirs:
   - path: "/path/to/backup_dir1"
     retention_days: 32

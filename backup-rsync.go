@@ -43,6 +43,7 @@ type Config struct {
 		Limit_concurrent_rsync interface{} `yaml:",omitempty"`
 		Retention_days interface{} `yaml:",omitempty"`
 		Login_user interface{} `yaml:",omitempty"`
+		Login_port interface{} `yaml:",omitempty"`
 		Dirs []struct {
 			Path string
 			Retention_days interface{} `yaml:",omitempty"`
@@ -58,6 +59,7 @@ type Path struct {
 	concurrentRsyncLimit int
 	bandwidthLimit interface{}
 	loginUser interface{}
+	loginPort interface{}
 }
 
 func worker(id int, jobs <-chan Command, results chan<- error) {
@@ -100,6 +102,7 @@ func getPaths(config Config) []Path {
 			p.path = dir.Path
 			p.bandwidthLimit = dir.Bandwidth_limit
 			p.loginUser = host.Login_user
+			p.loginPort = host.Login_port
 
 			if dir.Retention_days != nil {
 				p.retentionDays = dir.Retention_days.(int)
@@ -166,6 +169,9 @@ func prepareCommands(paths []Path, config Config) []Command {
 		}
 		if p.bandwidthLimit != nil {
 			s.args = append(s.args, fmt.Sprintf("--bwlimit=%d", p.bandwidthLimit.(int)))
+		}
+		if p.loginPort != nil {
+			s.args = append(s.args, []string{"-e", fmt.Sprintf("ssh -p %d", p.loginPort)}...)
 		}
 		if p.loginUser != nil {
 			s.args = append(s.args, p.loginUser.(string) + "@" + p.host + ":" + p.path + "/")
